@@ -1,0 +1,63 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.login-page {
+  align-items: center;
+  background: linear-gradient(135deg, #f8fbfa 0%, #edf3f1 48%, #f6f7f7 100%);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.login-card {
+  border-radius: 8px;
+  box-shadow: 0 20px 45px rgba(0, 64, 43, 0.14);
+  max-width: 460px;
+  padding: 42px 38px;
+  width: 100%;
+}
+
+.brand {
+  margin-bottom: 34px;
+  text-align: center;
+
+  h1 {
+    color: #007a53;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin: 12px 0 6px;
+  }
+
+  p {
+    color: #555;
+    font-size: 20px;
+    margin: 0;
+  }
+}
+
+.brand-mark {
+  align-items: center;
+  background: #007a53;
+  border-radius: 6px;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 800;
+  height: 42px;
+  justify-content: center;
+  width: 74px;
+}
+
+form {
+  display: grid;
+  gap: 20px;
+}
+
+button {
+  height: 52px;
+  font-size: 16px;
+  font-weight: 700;
+}

@@ -1,0 +1,98 @@
+.topbar {
+  background: #007a53;
+  box-shadow: 0 3px 12px rgba(0, 56, 38, 0.2);
+  color: #fff;
+  min-height: 64px;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.brand {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+nav {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+
+  a,
+  button {
+    color: #fff;
+  }
+
+  .active {
+    background: rgba(255, 255, 255, 0.18);
+  }
+}
+
+.hero {
+  align-items: center;
+  background: linear-gradient(135deg, #007a53, #0b6b50);
+  color: #fff;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 38px clamp(20px, 4vw, 56px);
+
+  h1 {
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: 0;
+    margin: 0;
+  }
+}
+
+.eyebrow,
+.subtitle {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.subtitle {
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.session {
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  min-width: 280px;
+  padding: 18px 20px;
+}
+
+.content {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 28px;
+}
+
+@media (max-width: 760px) {
+  .topbar,
+  .hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  nav {
+    flex-wrap: wrap;
+  }
+
+  .session {
+    min-width: 0;
+    width: 100%;
+  }
+}

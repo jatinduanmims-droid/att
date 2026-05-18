@@ -1,0 +1,9 @@
+<section class="cards">
+  @for (card of cards; track card.title) {
+    <mat-card class="dashboard-card" [routerLink]="card.route">
+      <div class="value">{{ card.value }}</div>
+      <h2>{{ card.title }}</h2>
+      <p>{{ card.description }}</p>
+    </mat-card>
+  }
+</section>

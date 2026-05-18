@@ -1,0 +1,9 @@
+<section class="external-grid">
+  @for (page of pages; track page) {
+    <mat-card class="external-card">
+      <h2>{{ page }}</h2>
+      <p>Reserved for approved internal redirection.</p>
+      <button mat-stroked-button color="primary" type="button" (click)="openPlaceholder()">Open</button>
+    </mat-card>
+  }
+</section>

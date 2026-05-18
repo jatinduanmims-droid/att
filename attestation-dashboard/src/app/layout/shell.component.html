@@ -1,0 +1,26 @@
+<mat-toolbar class="topbar">
+  <a class="brand" routerLink="/dashboard">ATTESTATION DASHBOARD</a>
+  <span class="spacer"></span>
+  <nav>
+    <a mat-button routerLink="/dashboard" routerLinkActive="active">Home</a>
+    <a mat-button routerLink="/upload" routerLinkActive="active">Upload Attestation</a>
+    <a mat-button routerLink="/external-pages" routerLinkActive="active">External Pages</a>
+    <button mat-button type="button" (click)="logout()">Logout</button>
+  </nav>
+</mat-toolbar>
+
+<section class="hero">
+  <div>
+    <p class="eyebrow">Internal Compliance Tool</p>
+    <h1>ATTESTATION DASHBOARD</h1>
+    <p class="subtitle">Enterprise Attestation Management Platform</p>
+  </div>
+  <div class="session">
+    <strong>Welcome, {{ user()?.username | titlecase }}</strong>
+    <span>Last login: {{ user()?.lastLogin | date: 'medium' }}</span>
+  </div>
+</section>
+
+<main class="content">
+  <router-outlet />
+</main>
