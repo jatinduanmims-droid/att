@@ -1,0 +1,121 @@
+.application-card {
+  width: 320px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #111;
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+
+.timeline-left {
+  width: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #14c38e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.circle.inactive {
+  background: #cfcfcf;
+  color: #666;
+}
+
+.line {
+  width: 2px;
+  flex: 1;
+  min-height: 48px;
+  background: #d8d8d8;
+  margin-top: 4px;
+}
+
+.last .line {
+  display: none;
+}
+
+.timeline-content {
+  flex: 1;
+  padding-bottom: 22px;
+  margin-left: 10px;
+}
+
+.timeline-content h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+}
+
+.timeline-content p {
+  margin-top: 8px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #777;
+}
+
+.task-btn {
+  border: none;
+  background: linear-gradient(90deg, #14c38e, #2be6a8);
+  color: #fff;
+  border-radius: 20px;
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.3s ease;
+}
+
+.task-btn:hover {
+  transform: translateY(-1px);
+}
+
+.step-row {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #222;
+}
+
+.icon {
+  font-size: 14px;
+  color: #666;
+}
+
+.collapsed {
+  padding-top: 2px;
+}
