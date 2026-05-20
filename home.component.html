@@ -1,0 +1,425 @@
+<div class="attestation-shell">
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/BNPP_LOGO.png" alt="BNPP Logo" class="sidebar-logo-img" />
+      <div>
+        <strong class="brand-name">PARIBAS</strong>
+        <span class="brand-caption">Controls &amp; Monitoring</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Primary navigation">
+      <a class="nav-link active">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-briefcase"></i>
+        <span>Categories</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-check-circle"></i>
+        <span>Controls</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Evidence</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-check-square"></i>
+        <span>Attestations</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Issues</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-file"></i>
+        <span>Reports</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Teams</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-user" *ngIf="currentUser && (currentUser.email || currentUser.uid)">
+      <span class="user-avatar">JS</span>
+      <div class="sidebar-user-text">
+        <strong>{{ currentUser.email || currentUser.uid }}</strong>
+        <span>Compliance Manager</span>
+      </div>
+      <i class="pi pi-chevron-down"></i>
+    </div>
+  </aside>
+
+  <main class="attestation-main">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand">
+        <div class="brand-text">
+          <h1 class="page-title">Controls Attestation Dashboard</h1>
+          <p class="page-subtitle">Monitor and manage controls attestation across all categories</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="refresh-pill">
+          <i class="pi pi-calendar"></i>
+
+          <div class="refresh-col">
+            <span class="refresh-lbl">Last refreshed</span>
+            <span class="refresh-val">
+              {{ lastRefreshed | date: "dd MMM yyyy, h:mm a" }}
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onRefresh()"
+          aria-label="Refresh">
+          <i class="pi pi-refresh"></i>
+        </button>
+
+        <button type="button" class="export-btn">
+          <i class="pi pi-download"></i>
+          <span>Export Report</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="home-container">
+      <!-- Category Buttons Section -->
+      <section class="category-section" *ngIf="categories.length > 0">
+        <h2 class="section-title">Select Category</h2>
+
+        <div class="category-buttons">
+          <button
+            *ngFor="let cat of categories"
+            type="button"
+            class="category-btn"
+            [class.selected]="selectedCategory === cat.category"
+            (click)="selectCategory(cat.category)">
+            <span
+              class="category-icon"
+              [style.background]="getCategoryColor(cat.category)">
+              <i class="pi pi-folder"></i>
+            </span>
+
+            <span class="category-selected-indicator" *ngIf="selectedCategory === cat.category">
+              <i class="pi pi-check"></i>
+            </span>
+
+            <div class="category-info">
+              <span class="category-name">
+                {{ cat.category }}
+              </span>
+
+              <span class="category-count">
+                {{ cat.totalControls }} controls
+
+                <span
+                  *ngIf="cat.pendingControls > 0"
+                  class="pending-dot"></span>
+              </span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Dashboard Section (Only when category selected) -->
+      <div class="dashboard-section" *ngIf="selectedCategory">
+        <!-- KPI Cards Row -->
+        <section class="kpi-row">
+          <button
+            type="button"
+            class="kpi-card blue"
+            (click)="selectCategory(selectedCategory)">
+            <div class="kpi-top">
+              <div class="kpi-icon">
+                <i class="pi pi-sitemap"></i>
+              </div>
+
+              <div class="kpi-body">
+                <span class="kpi-label">Total Controls</span>
+
+                <strong class="kpi-value">
+                  {{ getSelectedCategoryStats()?.totalControls || 0 }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="kpi-foot">
+              All controls in {{ selectedCategory }}
+            </div>
+          </button>
+
+          <button
+            type="button"
+            class="kpi-card green"
+            (click)="selectCategory(selectedCategory)">
+            <div class="kpi-top">
+              <div class="kpi-icon">
+                <i class="pi pi-check-circle"></i>
+              </div>
+
+              <div class="kpi-body">
+                <span class="kpi-label">Completed</span>
+
+                <strong class="kpi-value">
+                  {{ getSelectedCategoryStats()?.completedControls || 0 }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="kpi-foot">
+              {{
+                getPercentage(
+                  getSelectedCategoryStats()?.completedControls,
+                  getSelectedCategoryStats()?.totalControls
+                )
+              }}% completed
+            </div>
+
+            <div class="progress-track">
+              <span
+                class="progress-fill completed"
+                [style.width.%]="
+                  getPercentage(
+                    getSelectedCategoryStats()?.completedControls,
+                    getSelectedCategoryStats()?.totalControls
+                  )
+                "></span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            class="kpi-card orange"
+            (click)="selectCategory(selectedCategory)">
+            <div class="kpi-top">
+              <div class="kpi-icon">
+                <i class="pi pi-clock"></i>
+              </div>
+
+              <div class="kpi-body">
+                <span class="kpi-label">Pending</span>
+
+                <strong class="kpi-value">
+                  {{ getSelectedCategoryStats()?.pendingControls || 0 }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="kpi-foot">
+              {{
+                getPercentage(
+                  getSelectedCategoryStats()?.pendingControls,
+                  getSelectedCategoryStats()?.totalControls
+                )
+              }}% pending
+            </div>
+
+            <div class="progress-track">
+              <span
+                class="progress-fill pending"
+                [style.width.%]="
+                  getPercentage(
+                    getSelectedCategoryStats()?.pendingControls,
+                    getSelectedCategoryStats()?.totalControls
+                  )
+                "></span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            class="kpi-card purple"
+            (click)="selectCategory(selectedCategory)">
+            <div class="kpi-top">
+              <div class="kpi-icon">
+                <i class="pi pi-users"></i>
+              </div>
+
+              <div class="kpi-body">
+                <span class="kpi-label">Teams Responsible</span>
+
+                <strong class="kpi-value">
+                  {{ getTeamCount(selectedCategory) }}
+                </strong>
+              </div>
+            </div>
+
+            <div class="kpi-foot">
+              Unique teams in {{ selectedCategory }}
+            </div>
+          </button>
+        </section>
+
+        <!-- Workflow Section -->
+        <section class="workflow-section">
+          <h2 class="section-title">
+            Workflow Progress for {{ selectedCategory }}
+          </h2>
+
+          <div class="workflow-container">
+            <div class="workflow-steps">
+              <div
+                *ngFor="let step of workflowSteps; let i = index"
+                class="workflow-step"
+                [class.completed]="step.completed"
+                [class.status-current]="step.status === 'current'"
+                [class.status-pending]="step.status === 'pending'"
+                (click)="onStepClick(step.id);">
+                <div class="step-number">
+                  <i
+                    [ngClass]="step.icon"
+                    [class.done-icon]="step.status === 'done'"></i>
+
+                  <span class="step-number-text">
+                    {{ step.id }}
+                  </span>
+                </div>
+
+                <div class="step-content">
+                  <h3 class="step-title">{{ step.title }}</h3>
+                  <p class="step-desc">{{ step.description }}</p>
+                </div>
+
+                <div
+                  class="step-arrow"
+                  *ngIf="i < workflowSteps.length - 1">
+                  <i class="pi pi-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="insight-grid">
+          <article class="insight-card">
+            <h2 class="section-title">Completion Overview</h2>
+
+            <div class="completion-overview">
+              <div
+                class="donut-chart"
+                [style.--completed]="
+                  getPercentage(
+                    getSelectedCategoryStats()?.completedControls,
+                    getSelectedCategoryStats()?.totalControls
+                  )
+                ">
+                <div class="donut-center">
+                  <strong>
+                    {{
+                      getPercentage(
+                        getSelectedCategoryStats()?.completedControls,
+                        getSelectedCategoryStats()?.totalControls
+                      )
+                    }}%
+                  </strong>
+                  <span>Completed</span>
+                </div>
+              </div>
+
+              <div class="legend-list">
+                <div class="legend-row">
+                  <span class="legend-dot completed"></span>
+                  <span>Completed</span>
+                  <strong>
+                    {{ getSelectedCategoryStats()?.completedControls || 0 }}
+                    ({{
+                      getPercentage(
+                        getSelectedCategoryStats()?.completedControls,
+                        getSelectedCategoryStats()?.totalControls
+                      )
+                    }}%)
+                  </strong>
+                </div>
+
+                <div class="legend-row">
+                  <span class="legend-dot pending"></span>
+                  <span>Pending</span>
+                  <strong>
+                    {{ getSelectedCategoryStats()?.pendingControls || 0 }}
+                    ({{
+                      getPercentage(
+                        getSelectedCategoryStats()?.pendingControls,
+                        getSelectedCategoryStats()?.totalControls
+                      )
+                    }}%)
+                  </strong>
+                </div>
+
+                <div class="legend-row">
+                  <span class="legend-dot overdue"></span>
+                  <span>Overdue</span>
+                  <strong>0 (0%)</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="insight-card">
+            <div class="insight-card-header">
+              <h2 class="section-title">Controls by Team</h2>
+              <button type="button" class="view-all-btn">View all teams</button>
+            </div>
+
+            <div class="team-bars">
+              <div class="team-row">
+                <span>Compliance Team</span>
+                <div class="team-track">
+                  <span class="team-fill wide"></span>
+                </div>
+                <strong>{{ getSelectedCategoryStats()?.totalControls || 0 }}</strong>
+              </div>
+
+              <div class="team-row">
+                <span>IT Risk Team</span>
+                <div class="team-track">
+                  <span class="team-fill medium"></span>
+                </div>
+                <strong>{{ getSelectedCategoryStats()?.pendingControls || 0 }}</strong>
+              </div>
+
+              <div class="team-row">
+                <span>Ops Team</span>
+                <div class="team-track">
+                  <span class="team-fill short"></span>
+                </div>
+                <strong>{{ getSelectedCategoryStats()?.completedControls || 0 }}</strong>
+              </div>
+
+              <div class="team-row">
+                <span>Audit Team</span>
+                <div class="team-track">
+                  <span class="team-fill compact"></span>
+                </div>
+                <strong>{{ getTeamCount(selectedCategory) }}</strong>
+              </div>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="empty-state"
+        *ngIf="categories.length === 0">
+        <div class="empty-icon">
+          <i class="pi pi-inbox"></i>
+        </div>
+
+        <h3>No categories found</h3>
+        <p>Upload some data to get started</p>
+      </div>
+    </div>
+  </main>
+</div>
