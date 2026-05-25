@@ -1,0 +1,516 @@
+<div class="attestation-shell">
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/BNPP_LOGO.png" alt="BNPP Logo" class="sidebar-logo-img" />
+      <div>
+        <strong class="brand-name">BNP PARIBAS</strong>
+        <span class="brand-caption">The bank for a changing world</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Primary navigation">
+      <a class="nav-link active">
+        <i class="pi pi-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-briefcase"></i>
+        <span>Categories</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-check-circle"></i>
+        <span>Controls</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-folder-open"></i>
+        <span>Evidence</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-check-square"></i>
+        <span>Attestations</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Issues</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-file"></i>
+        <span>Reports</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-users"></i>
+        <span>Teams</span>
+      </a>
+      <a class="nav-link">
+        <i class="pi pi-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-user" *ngIf="currentUser && (currentUser.email || currentUser.uid)">
+      <span class="user-avatar">JS</span>
+      <div class="sidebar-user-text">
+        <strong>{{ currentUser.email || currentUser.uid }}</strong>
+        <span>Compliance Manager</span>
+      </div>
+      <i class="pi pi-chevron-down"></i>
+    </div>
+  </aside>
+
+  <main class="attestation-main">
+    <header class="top-header">
+      <div class="brand-text">
+        <h1 class="page-title">Controls Attestation Dashboard</h1>
+        <p class="page-subtitle">Controls &amp; Monitoring</p>
+      </div>
+
+      <div class="header-right">
+        <div class="refresh-pill">
+          <i class="pi pi-calendar"></i>
+
+          <div class="refresh-col">
+            <span class="refresh-lbl">Last refreshed</span>
+            <span class="refresh-val">
+              {{ lastRefreshed | date:'dd MMM yyyy, h:mm a' }}
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onRefresh()"
+          aria-label="Refresh">
+          <i class="pi pi-refresh"></i>
+        </button>
+
+        <button type="button" class="export-btn">
+          <i class="pi pi-download"></i>
+          <span>Export Report</span>
+        </button>
+      </div>
+    </header>
+
+    <mat-card class="upload-card">
+      <div class="card-actions">
+        <button type="button" class="utility-btn">
+          <i class="pi pi-calendar"></i>
+          <span>LAST REFRESHED</span>
+        </button>
+
+        <button
+          type="button"
+          class="utility-icon-btn"
+          (click)="onRefresh()"
+          aria-label="Refresh">
+          <i class="pi pi-refresh"></i>
+        </button>
+      </div>
+
+      <div class="upload-grid">
+        <div class="upload-section">
+          <label
+            class="drop-zone"
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+            [class.frozen]="isAttestationFrozen()">
+            <input
+              type="file"
+              multiple
+              (change)="onFileChange($event)"
+              [disabled]="isAttestationFrozen()" />
+
+            <span class="drop-icon">
+              <i class="pi pi-cloud-upload"></i>
+            </span>
+
+            <span class="drop-title">
+              {{
+                selectedFiles().length > 0
+                  ? (selectedFiles().length + ' file(s) selected')
+                  : (isAttestationFrozen()
+                      ? 'Attestation is frozen'
+                      : 'Drag and drop attestation files')
+              }}
+            </span>
+
+            <span class="drop-help">
+              {{
+                isAttestationFrozen()
+                  ? 'Upload is disabled due to frozen attestation'
+                  : 'PDF, Excel, Word, ZIP, images, and any file type supported'
+              }}
+            </span>
+
+            <span class="browse-btn">
+              <i class="pi pi-folder"></i>
+              <span>Browse Files</span>
+            </span>
+
+            <span class="file-limit">Maximum file size: 100 MB</span>
+          </label>
+
+          @if (selectedFiles().length > 0) {
+            <div class="selected-files-list">
+              <h4>
+                Selected Files ({{ selectedFiles().length }})
+              </h4>
+
+              <ul>
+                @for (file of selectedFiles(); track $index) {
+                  <li>
+                    <span class="file-name">
+                      {{ file.name }}
+                    </span>
+
+                    <span class="file-size">
+                      {{ formatSize(file.size) }}
+                    </span>
+
+                    <button
+                      type="button"
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeFile($index)"
+                      aria-label="Remove file">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+
+        <form
+          class="upload-form"
+          [formGroup]="form"
+          [class.frozen]="isAttestationFrozen()">
+          <mat-form-field appearance="outline">
+            <mat-label>Attestation Type</mat-label>
+
+            <mat-select
+              formControlName="attestationType"
+              [disabled]="isAttestationFrozen()">
+              @for (type of attestationTypes(); track $index) {
+                <mat-option [value]="type">
+                  {{ type }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Year</mat-label>
+
+            <mat-select
+              formControlName="year"
+              [disabled]="isAttestationFrozen()">
+              @for (year of years(); track $index) {
+                <mat-option [value]="year">
+                  {{ year }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="remarks">
+            <mat-label>Remarks</mat-label>
+
+            <textarea
+              matInput
+              rows="4"
+              formControlName="remarks"
+              [disabled]="isAttestationFrozen()"
+              placeholder="Enter remarks (optional)"></textarea>
+          </mat-form-field>
+
+          <div class="actions">
+            <button
+              mat-stroked-button
+              class="outline-action"
+              type="button"
+              (click)="upload()"
+              [disabled]="isAttestationFrozen()">
+              <i class="pi pi-upload"></i>
+              <span>Upload</span>
+            </button>
+
+            @if (isAttestationFrozen()) {
+              <button
+                mat-flat-button
+                class="outline-action"
+                type="button"
+                (click)="openUnfreezeDialog()">
+                <i class="pi pi-lock-open"></i>
+                <span>Unfreeze Attestation</span>
+              </button>
+            } @else {
+              <button
+                mat-flat-button
+                class="outline-action"
+                type="button"
+                (click)="openFreezeDialog()">
+                <i class="pi pi-lock"></i>
+                <span>Freeze Attestation</span>
+              </button>
+
+              <button
+                mat-flat-button
+                class="primary-action"
+                type="button"
+                (click)="submit()"
+                [disabled]="isAttestationFrozen()">
+                <i class="pi pi-send"></i>
+                <span>Submit Attestation</span>
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </mat-card>
+
+    <mat-card class="table-card">
+      <div class="table-toolbar">
+        <h2>Uploaded Attestations</h2>
+
+        <div class="table-tools">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search files...</mat-label>
+
+            <input
+              matInput
+              (input)="applyFilter($event)" />
+          </mat-form-field>
+
+          <button type="button" class="utility-icon-btn" aria-label="Filter">
+            <i class="pi pi-filter"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table
+          mat-table
+          matSort
+          [dataSource]="dataSource">
+          <!-- Sr No -->
+          <ng-container matColumnDef="srNo">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+              Sr No
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record; let i = index">
+              {{ i + 1 }}
+            </td>
+          </ng-container>
+
+          <!-- File Name -->
+          <ng-container matColumnDef="fileName">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              File Name
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record"
+              class="file-cell">
+              <i class="pi pi-file"></i>
+              <span>{{ record.originalFileName || record.fileName }}</span>
+            </td>
+          </ng-container>
+
+          <!-- File Type -->
+          <ng-container matColumnDef="fileType">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              File Type
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              {{ record.fileType || 'Requirement' }}
+            </td>
+          </ng-container>
+
+          <!-- Attestation Type -->
+          <ng-container matColumnDef="attestationType">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              Attestation Type
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              {{ record.category || record.attestationType }}
+            </td>
+          </ng-container>
+
+          <!-- Year -->
+          <ng-container matColumnDef="year">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              Year
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              {{ record.calendarYear || record.year }}
+            </td>
+          </ng-container>
+
+          <!-- Uploaded By -->
+          <ng-container matColumnDef="uploadedBy">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              Uploaded By
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record"
+              class="uploaded-by-cell">
+              <span class="mini-avatar">JS</span>
+              <span>{{ record.uploadedBy }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Upload Date -->
+          <ng-container matColumnDef="uploadDate">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              Upload Date
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              {{ record.uploadDate | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- File Size -->
+          <ng-container matColumnDef="fileSize">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              File Size
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              {{ record.fileSize }}
+            </td>
+          </ng-container>
+
+          <!-- Status -->
+          <ng-container matColumnDef="status">
+            <th
+              mat-header-cell
+              mat-sort-header
+              *matHeaderCellDef>
+              Status
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              <span class="status">
+                {{ record.status }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Remarks -->
+          <ng-container matColumnDef="remarks">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+              Remarks
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record">
+              {{ record.remarks || '-' }}
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="actions">
+            <th
+              mat-header-cell
+              *matHeaderCellDef>
+              Actions
+            </th>
+
+            <td
+              mat-cell
+              *matCellDef="let record"
+              class="row-actions">
+              <button
+                mat-button
+                color="primary"
+                type="button"
+                (click)="view(record)">
+                View
+              </button>
+
+              <button
+                mat-button
+                color="primary"
+                type="button"
+                (click)="download(record)">
+                Download
+              </button>
+
+              <button
+                mat-button
+                color="warn"
+                type="button"
+                (click)="delete(record.id)">
+                Delete
+              </button>
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        [pageSize]="5"
+        [pageSizeOptions]="[5, 10, 25]"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card>
+  </main>
+</div>

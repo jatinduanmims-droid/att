@@ -276,11 +276,17 @@
                 [class.completed]="step.completed"
                 [class.status-current]="step.status === 'current'"
                 [class.status-pending]="step.status === 'pending'"
-                (click)="onStepClick(step.id);">
+                [class.locked]="step.status === 'pending'"
+                [attr.aria-disabled]="step.status === 'pending'"
+                (click)="step.status !== 'pending' && onStepClick(step.id);">
                 <div class="step-number">
                   <i
                     [ngClass]="step.icon"
                     [class.done-icon]="step.status === 'done'"></i>
+
+                  <i
+                    class="pi pi-lock step-lock"
+                    *ngIf="step.status === 'pending'"></i>
 
                   <span class="step-number-text">
                     {{ step.id }}
